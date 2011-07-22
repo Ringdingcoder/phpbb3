@@ -344,6 +344,7 @@ $lang['Add_poll'] = 'Add a Poll';
 $lang['Add_poll_explain'] = 'If you do not want to add a poll to your topic leave the fields blank';
 $lang['Poll_question'] = 'Poll question';
 $lang['Poll_option'] = 'Poll option';
+$lang['Poll_type_multi'] = 'Multiple Choice';
 $lang['Add_option'] = 'Add option';
 $lang['Update'] = 'Update';
 $lang['Delete'] = 'Delete';

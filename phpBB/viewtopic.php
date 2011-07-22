@@ -646,7 +646,7 @@ $template->assign_vars(array(
 //
 if ( !empty($forum_topic_data['topic_vote']) )
 {
-	$sql = "SELECT vd.vote_id, vd.vote_text, vd.vote_start, vd.vote_length, vr.vote_option_id, vr.vote_option_text, vr.vote_result
+	$sql = "SELECT vd.vote_id, vd.vote_text, vd.vote_start, vd.vote_length, vd.vote_type, vr.vote_option_id, vr.vote_option_text, vr.vote_result
 		FROM " . VOTE_DESC_TABLE . " vd, " . VOTE_RESULTS_TABLE . " vr
 		WHERE vd.topic_id = $topic_id
 			AND vr.vote_id = vd.vote_id
@@ -663,6 +663,7 @@ if ( !empty($forum_topic_data['topic_vote']) )
 
 		$vote_id = $vote_info[0]['vote_id'];
 		$vote_title = $vote_info[0]['vote_text'];
+		$vote_type = $vote_info[0]['vote_type'];
 
 		$sql = "SELECT vote_id
 			FROM " . VOTE_USERS_TABLE . "
@@ -770,7 +771,8 @@ if ( !empty($forum_topic_data['topic_vote']) )
 			'POLL_QUESTION' => $vote_title,
 
 			'S_HIDDEN_FIELDS' => ( !empty($s_hidden_fields) ) ? $s_hidden_fields : '',
-			'S_POLL_ACTION' => append_sid("posting.$phpEx?" . POST_TOPIC_URL . "=$topic_id"))
+			'S_POLL_ACTION' => append_sid("posting.$phpEx?" . POST_TOPIC_URL . "=$topic_id"),
+			'POLL_TYPE' => $vote_type == 'r' ? 'radio' : 'checkbox')
 		);
 
 		$template->assign_var_from_handle('POLL_DISPLAY', 'pollbox');

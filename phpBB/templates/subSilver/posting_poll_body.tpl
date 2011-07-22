@@ -19,6 +19,12 @@
 				<td class="row1"><span class="gen"><b>{L_POLL_OPTION}</b></span></td>
 				<td class="row2"><span class="genmed"><input type="text" name="add_poll_option_text" size="50" maxlength="255" class="post" value="{ADD_POLL_OPTION}" /></span> &nbsp;<input type="submit" name="add_poll_option" value="{L_ADD_OPTION}" class="liteoption" /></td>
 			</tr>
+			<!-- BEGIN switch_poll_type_toggle -->
+            <tr>
+				<td class="row1"><span class="gen"><b>{L_POLL_TYPE_MULTI}</b></span></td>
+				<td class="row2"><input type="checkbox" name="poll_type_multi" /></td>
+			</tr>
+			<!-- END switch_poll_type_toggle -->
             <tr>
 				<td class="row1"><span class="gen"><b>{L_POLL_LENGTH}</b></span></td>
 				<td class="row2"><span class="genmed"><input type="text" name="poll_length" size="3" maxlength="3" class="post" value="{POLL_LENGTH}" /></span>&nbsp;<span class="gen"><b>{L_DAYS}</b></span> &nbsp; <span class="gensmall">{L_POLL_LENGTH_EXPLAIN}</span></td>

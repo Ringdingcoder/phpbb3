@@ -211,7 +211,7 @@ function prepare_post(&$mode, &$post_data, &$bbcode_on, &$html_on, &$smilies_on,
 //
 // Post a new topic/reply/poll or edit existing post/poll
 //
-function submit_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_id, &$post_id, &$poll_id, &$topic_type, &$bbcode_on, &$html_on, &$smilies_on, &$attach_sig, &$bbcode_uid, &$post_username, &$post_subject, &$post_message, &$poll_title, &$poll_options, &$poll_length)
+function submit_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_id, &$post_id, &$poll_id, &$topic_type, &$bbcode_on, &$html_on, &$smilies_on, &$attach_sig, &$bbcode_uid, &$post_username, &$post_subject, &$post_message, &$poll_title, &$poll_options, &$poll_length, $poll_type)
 {
 	global $board_config, $lang, $db, $phpbb_root_path, $phpEx;
 	global $userdata, $user_ip;
@@ -285,7 +285,7 @@ function submit_post($mode, &$post_data, &$message, &$meta, &$forum_id, &$topic_
 	// 
 	if ( ( $mode == 'newtopic' || $mode == 'editpost' ) && !empty($poll_title) && count($poll_options) >= 2 )
 	{
-		$sql = ( !$post_data['has_poll'] ) ? "INSERT INTO " . VOTE_DESC_TABLE . " (topic_id, vote_text, vote_start, vote_length) VALUES ($topic_id, '$poll_title', $current_time, " . ( $poll_length * 86400 ) . ")" : "UPDATE " . VOTE_DESC_TABLE . " SET vote_text = '$poll_title', vote_length = " . ( $poll_length * 86400 ) . " WHERE topic_id = $topic_id";
+		$sql = ( !$post_data['has_poll'] ) ? "INSERT INTO " . VOTE_DESC_TABLE . " (topic_id, vote_text, vote_start, vote_length, vote_type) VALUES ($topic_id, '$poll_title', $current_time, " . ( $poll_length * 86400 ) . ", '$poll_type')" : "UPDATE " . VOTE_DESC_TABLE . " SET vote_text = '$poll_title', vote_length = " . ( $poll_length * 86400 ) . " WHERE topic_id = $topic_id";
 		if ( !$db->sql_query($sql) )
 		{
 			message_die(GENERAL_ERROR, 'Error in posting', '', __LINE__, __FILE__, $sql);

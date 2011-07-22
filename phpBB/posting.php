@@ -30,7 +30,7 @@ include($phpbb_root_path . 'includes/functions_post.'.$phpEx);
 //
 // Check and set various parameters
 //
-$params = array('submit' => 'post', 'confirm' => 'confirm', 'preview' => 'preview', 'delete' => 'delete', 'poll_delete' => 'poll_delete', 'poll_add' => 'add_poll_option', 'poll_edit' => 'edit_poll_option', 'mode' => 'mode');
+$params = array('submit' => 'post', 'confirm' => 'confirm', 'preview' => 'preview', 'delete' => 'delete', 'poll_type_multi' => 'poll_type_multi', 'poll_delete' => 'poll_delete', 'poll_add' => 'add_poll_option', 'poll_edit' => 'edit_poll_option', 'mode' => 'mode');
 while( list($var, $param) = @each($params) )
 {
 	if ( !empty($HTTP_POST_VARS[$param]) || !empty($HTTP_GET_VARS[$param]) )
@@ -269,6 +269,7 @@ if ( $result = $db->sql_query($sql) )
 				$poll_title = $row['vote_text'];
 				$poll_id = $row['vote_id'];
 				$poll_length = $row['vote_length'] / 86400;
+				$poll_type = $row['vote_type'];
 
 				do
 				{
@@ -454,13 +455,10 @@ else if ( $mode == 'vote' )
 	//
 	if ( !empty($HTTP_POST_VARS['vote_id']) )
 	{
-		$vote_option_id = intval($HTTP_POST_VARS['vote_id']);
-
 		$sql = "SELECT vd.vote_id    
 			FROM " . VOTE_DESC_TABLE . " vd, " . VOTE_RESULTS_TABLE . " vr
 			WHERE vd.topic_id = $topic_id 
 				AND vr.vote_id = vd.vote_id 
-				AND vr.vote_option_id = $vote_option_id
 			GROUP BY vd.vote_id";
 		if ( !($result = $db->sql_query($sql)) )
 		{
@@ -482,13 +480,17 @@ else if ( $mode == 'vote' )
 
 			if ( !($row = $db->sql_fetchrow($result)) )
 			{
-				$sql = "UPDATE " . VOTE_RESULTS_TABLE . " 
-					SET vote_result = vote_result + 1 
-					WHERE vote_id = $vote_id 
-						AND vote_option_id = $vote_option_id";
-				if ( !$db->sql_query($sql, BEGIN_TRANSACTION) )
+				foreach( $HTTP_POST_VARS['vote_id'] as $vote_option_id )
 				{
-					message_die(GENERAL_ERROR, 'Could not update poll result', '', __LINE__, __FILE__, $sql);
+				    $vote_option_id = intval($vote_option_id);
+				    $sql = "UPDATE " . VOTE_RESULTS_TABLE . " 
+					    SET vote_result = vote_result + 1 
+					    WHERE vote_id = $vote_id 
+						    AND vote_option_id = $vote_option_id";
+				    if ( !$db->sql_query($sql, BEGIN_TRANSACTION) )
+				    {
+					    message_die(GENERAL_ERROR, 'Could not update poll result', '', __LINE__, __FILE__, $sql);
+				    }
 				}
 
 				$sql = "INSERT INTO " . VOTE_USERS_TABLE . " (vote_id, vote_user_id, vote_user_ip) 
@@ -544,7 +546,7 @@ else if ( $submit || $confirm )
 			{
 				$topic_type = ( $topic_type != $post_data['topic_type'] && !$is_auth['auth_sticky'] && !$is_auth['auth_announce'] ) ? $post_data['topic_type'] : $topic_type;
 
-				submit_post($mode, $post_data, $return_message, $return_meta, $forum_id, $topic_id, $post_id, $poll_id, $topic_type, $bbcode_on, $html_on, $smilies_on, $attach_sig, $bbcode_uid, str_replace("\'", "''", $username), str_replace("\'", "''", $subject), str_replace("\'", "''", $message), str_replace("\'", "''", $poll_title), $poll_options, $poll_length);
+				submit_post($mode, $post_data, $return_message, $return_meta, $forum_id, $topic_id, $post_id, $poll_id, $topic_type, $bbcode_on, $html_on, $smilies_on, $attach_sig, $bbcode_uid, str_replace("\'", "''", $username), str_replace("\'", "''", $subject), str_replace("\'", "''", $message), str_replace("\'", "''", $poll_title), $poll_options, $poll_length, $poll_type_multi == '' ? 'r' : 'm');
 				if ( $error_msg == '' )
 				{
 					user_notification($mode, $post_data, $forum_id, $topic_id, $post_id, $notify_user);
@@ -1048,6 +1050,7 @@ if( ( $mode == 'newtopic' || ( $mode == 'editpost' && $post_data['first_post'] )
 		'L_ADD_POLL_EXPLAIN' => $lang['Add_poll_explain'],   
 		'L_POLL_QUESTION' => $lang['Poll_question'],   
 		'L_POLL_OPTION' => $lang['Poll_option'],  
+		'L_POLL_TYPE_MULTI' => $lang['Poll_type_multi'],  
 		'L_ADD_OPTION' => $lang['Add_option'],
 		'L_UPDATE_OPTION' => $lang['Update'],
 		'L_DELETE_OPTION' => $lang['Delete'], 
@@ -1060,6 +1063,10 @@ if( ( $mode == 'newtopic' || ( $mode == 'editpost' && $post_data['first_post'] )
 		'POLL_LENGTH' => $poll_length)
 	);
 
+	if( $mode == 'newtopic' )
+	{
+		$template->assign_block_vars('switch_poll_type_toggle', array());
+	}
 	if( $mode == 'editpost' && $post_data['edit_poll'] )
 	{
 		$template->assign_block_vars('switch_poll_delete_toggle', array());

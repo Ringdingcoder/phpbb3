@@ -7,7 +7,7 @@
 						<td align="center"><table cellspacing="0" cellpadding="2" border="0">
 							<!-- BEGIN poll_option -->
 							<tr>
-								<td><input type="radio" name="vote_id" value="{poll_option.POLL_OPTION_ID}" />&nbsp;</td>
+								<td><input type="{POLL_TYPE}" name="vote_id[]" value="{poll_option.POLL_OPTION_ID}" />&nbsp;</td>
 								<td><span class="gen">{poll_option.POLL_OPTION_CAPTION}</span></td>
 							</tr>
 							<!-- END poll_option -->
